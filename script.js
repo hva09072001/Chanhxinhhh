@@ -206,28 +206,23 @@ const fx=(()=>{
   const size=()=>{W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);};
   addEventListener('resize',size);size();
 
-  const pm=()=>Math.random()<.5?-1:1;               // ngẫu nhiên +1 hoặc -1
+  const pm=()=>Math.random()<.5?-1:1;
 
-  /* Mỗi hạt có "t" từ 0 (nhỏ) đến 1 (to). To thì rơi nhanh, xoay nhanh; nhỏ thì nhẹ, chậm */
+  /* Mỗi hạt có "t" từ 0 (nhỏ) đến 1 (to). To thì rơi nhanh hơn, nhỏ thì nhẹ và chậm */
   const mk=init=>{
     const t=Math.random();
     const p={
-      t, x:Math.random()*W, y:init?Math.random()*H:-30,
-      dir:pm(),                                      // hướng xoay ngẫu nhiên
-      a:Math.random()*6.283,                         // góc hiện tại
-      s:Math.random()*6.283,                         // pha lắc ngang
-      tw:Math.random()*6.283                         // pha lấp lánh
+      t, x:Math.random()*W, y:init?Math.random()*H:-40,
+      dir:pm(), a:Math.random()*6.283,
+      s:Math.random()*6.283, tw:Math.random()*6.283
     };
     if(kind==='snow'){
-      p.r=4+t*10;                                    // bán kính 4 → 14
-      p.vy=.35+t*1.0;                                // to rơi nhanh hơn một chút
-      p.spin=.004+t*.012;                            // to xoay nhanh hơn
-      p.sw=.2+t*.3; p.al=.5+t*.45;                   // nhỏ thì mờ hơn
+      p.r=4+t*10; p.vy=.35+t*1.0; p.spin=.004+t*.012;
+      p.sw=.2+t*.3; p.al=.5+t*.45;
     }else if(kind==='mai'){
-      p.r=5+t*6;                                     // đồng xu nhỏ gọn hơn
-      p.vy=.35+t*.9;
-      p.spin=.015+t*.03;                             // tốc độ lật trái/phải
-      p.sw=.2+t*.25; p.al=.7+t*.25;
+      p.type=Math.random()<.5?'coin':'lixi';       // ngẫu nhiên: đồng vàng hoặc bao lì xì
+      p.r=4+t*5; p.vy=.45+t*.9; p.spin=.01+t*.025;
+      p.sw=.3+t*.3; p.al=1;
     }else{
       p.r=3+t*4; p.vy=.4+t*.7; p.spin=.01+t*.02; p.sw=.4; p.al=.9;
     }
@@ -252,54 +247,85 @@ const fx=(()=>{
     ctx.shadowBlur=0;
   }
 
-  /* Đồng xu vàng dịu, lật qua trái/phải (xoay quanh trục dọc) */
-    /* Đồng xu 3D: quay quanh trục dọc, có cạnh dày + sáng tối */
-  function coin(r,ang){
-    const c=Math.cos(ang), s=Math.sin(ang);
-    const w=Math.abs(c);                       // độ rộng nhìn thấy của mặt đồng
-    const rx=Math.max(.5,r*w);                 // bán kính ngang
-    const th=r*.2;                             // độ dày đồng xu
-    const fx=s*th/2;                           // mặt trước lệch sang một bên theo góc quay
-    const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
-    const L=Math.abs(s);                       // cạnh sáng nhất khi đồng đứng nghiêng
-
-    /* 1) CẠNH ĐỒNG XU */
-    const edge=`rgb(${lerp(150,230,L)},${lerp(112,196,L)},${lerp(42,108,L)})`;
-    ctx.fillStyle=edge;
-    ctx.fillRect(Math.min(-fx,fx),-r,Math.abs(fx*2),r*2);
-    ctx.beginPath();ctx.ellipse(-fx,0,rx,r,0,0,6.283);ctx.fill();   // mặt sau
-    ctx.beginPath();ctx.ellipse( fx,0,rx,r,0,0,6.283);ctx.fill();   // mặt trước
-
-    /* 2) MẶT ĐỒNG GẦN NGƯỜI XEM NHẤT */
-    const front=c>=0, cx=front?fx:-fx;
-    ctx.save();
-    ctx.translate(cx,0);
-    ctx.beginPath();ctx.ellipse(0,0,rx,r,0,0,6.283);ctx.clip();
-
-    // nền vàng dịu + vệt sáng trượt ngang khi quay
-    const hl=Math.max(.15,Math.min(.85,.5+s*.38*(front?1:-1)));
-    const g=ctx.createLinearGradient(-rx,0,rx,0);
-    g.addColorStop(0,front?'#D9B65C':'#CFAA4F');
-    g.addColorStop(hl,front?'#F8EDC0':'#F0E0A6');
-    g.addColorStop(1,front?'#CFA845':'#C69C3E');
-    ctx.fillStyle=g;ctx.fillRect(-rx,-r,rx*2,r*2);
-
-    // chi tiết mặt đồng (co theo bề ngang)
-    ctx.save();ctx.scale(w,1);
-    ctx.lineWidth=Math.max(.7,r*.07);ctx.strokeStyle='rgba(160,115,32,.6)';
-    ctx.beginPath();ctx.arc(0,0,r*.8,0,6.283);ctx.stroke();          // viền nổi
-    if(front){
-      const h=r*.22;ctx.fillStyle='rgba(135,95,26,.5)';
-      ctx.fillRect(-h,-h,h*2,h*2);                                    // lỗ vuông mờ
-    }
-    ctx.restore();
-
-    // tối dần khi mặt đồng xoay nghiêng (bóng đổ)
-    ctx.fillStyle=`rgba(70,45,5,${(1-w)*.5})`;
-    ctx.fillRect(-rx,-r,rx*2,r*2);
-    ctx.restore();
+  /* Đồng vàng tròn, có lỗ vuông và vệt sáng (BẢN ĐẦU TIÊN) */
+  function coin(r){
+    const g=ctx.createRadialGradient(-r*.3,-r*.3,r*.1,0,0,r);
+    g.addColorStop(0,'#FFF7B8');g.addColorStop(.5,'#FFC83D');g.addColorStop(1,'#D98A00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,6.283);ctx.fill();
+    ctx.lineWidth=Math.max(1,r*.1);ctx.strokeStyle='#B8740A';
+    ctx.beginPath();ctx.arc(0,0,r*.84,0,6.283);ctx.stroke();            // viền nổi
+    const h=r*.3;ctx.fillStyle='#8A4B00';ctx.fillRect(-h,-h,h*2,h*2);   // lỗ vuông
+    ctx.fillStyle='rgba(255,255,255,.6)';                                // vệt sáng
+    ctx.beginPath();ctx.ellipse(-r*.4,-r*.42,r*.22,r*.09,-.75,0,6.283);ctx.fill();
   }
 
+  /* Tia lấp lánh 4 cánh */
+  function spark(r,al){
+    ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.beginPath();
+    ctx.moveTo(0,-r);ctx.quadraticCurveTo(0,0,r,0);ctx.quadraticCurveTo(0,0,0,r);
+    ctx.quadraticCurveTo(0,0,-r,0);ctx.quadraticCurveTo(0,0,0,-r);ctx.fill();
+  }
+
+  /* Bao lì xì đỏ viền vàng, có nắp và nút tròn vàng */
+  function lixi(r){
+    const w=r*1.5,h=r*2.3,k=r*.3;                 // nửa rộng, nửa cao, độ bo góc
+    const g=ctx.createLinearGradient(0,-h,0,h);
+    g.addColorStop(0,'#F0262E');g.addColorStop(1,'#B80F17');
+    ctx.fillStyle=g;ctx.strokeStyle='#F7B928';ctx.lineWidth=Math.max(1,r*.12);
+    ctx.beginPath();
+    ctx.moveTo(-w+k,-h);ctx.arcTo(w,-h,w,h,k);ctx.arcTo(w,h,-w,h,k);
+    ctx.arcTo(-w,h,-w,-h,k);ctx.arcTo(-w,-h,w,-h,k);ctx.closePath();
+    ctx.fill();ctx.stroke();
+    ctx.beginPath();                               // đường nắp phong bì
+    ctx.moveTo(-w,-h*.35);ctx.quadraticCurveTo(0,h*.25,w,-h*.35);ctx.stroke();
+    ctx.fillStyle='#FFD84D';                       // nút vàng
+    ctx.beginPath();ctx.arc(0,h*.02,r*.5,0,6.283);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.beginPath();ctx.arc(-r*.15,-h*.04,r*.14,0,6.283);ctx.fill();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){
+      ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=p.al;
+      if(kind==='snow'){
+        ctx.rotate(p.a);flake(p.r);
+      }else if(kind==='mai'){
+        if(p.type==='coin'){
+          const R=p.r*1.9;
+          ctx.save();ctx.scale(.75+.25*Math.abs(Math.cos(p.a)),1);coin(R);ctx.restore();
+          const al=Math.pow(Math.max(0,Math.sin(p.tw)),3);              // lấp lánh
+          if(al>.05){ctx.translate(R*.45,-R*.45);spark(R*.9*al+2,al);}
+        }else{
+          ctx.rotate(Math.sin(p.a)*.6);                                 // bao lì xì đung đưa khi rơi
+          lixi(p.r*1.4);
+        }
+      }else{
+        ctx.rotate(p.a);ctx.fillStyle='#F8A5C0';
+        ctx.beginPath();ctx.ellipse(0,0,p.r*1.5,p.r*.9,0,0,6.283);ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  function loop(){
+    for(const p of ps){
+      p.s+=.015;p.tw+=.06;
+      p.x+=Math.sin(p.s)*p.sw;
+      p.y+=p.vy;
+      p.a+=p.dir*p.spin;
+      if(p.y>H+40){Object.assign(p,mk(false));}
+    }
+    draw();raf=requestAnimationFrame(loop);
+  }
+
+  function set(k){
+    kind=k;const n=innerWidth<700?22:42;
+    ps=Array.from({length:n},()=>mk(true));
+    if(!raf)loop();
+  }
+  return {set};
+})();
 /* ================== KHỞI TẠO ================== */
 $$('img[data-src]').forEach(i=>i.src=IMG[i.dataset.src]);
 renderFilters(); renderGrid(); renderCart();
