@@ -253,64 +253,52 @@ const fx=(()=>{
   }
 
   /* Đồng xu vàng dịu, lật qua trái/phải (xoay quanh trục dọc) */
+    /* Đồng xu 3D: quay quanh trục dọc, có cạnh dày + sáng tối */
   function coin(r,ang){
-    const c=Math.cos(ang), front=c>=0;
-    ctx.scale(Math.max(.14,Math.abs(c)),1);          // ép bề ngang để tạo cảm giác lật
-    const g=ctx.createRadialGradient(-r*.3,-r*.3,r*.1,0,0,r);
-    if(front){ g.addColorStop(0,'#F7EBB9');g.addColorStop(.6,'#E8C766');g.addColorStop(1,'#CDA23A'); }
-    else     { g.addColorStop(0,'#EFDDA0');g.addColorStop(.6,'#DDB955');g.addColorStop(1,'#BE9430'); }
-    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,6.283);ctx.fill();
-    ctx.lineWidth=Math.max(.8,r*.07);ctx.strokeStyle='rgba(176,132,40,.7)';
-    ctx.beginPath();ctx.arc(0,0,r*.82,0,6.283);ctx.stroke();           // viền mảnh
-    const h=r*.24;ctx.fillStyle='rgba(140,98,28,.5)';ctx.fillRect(-h,-h,h*2,h*2); // lỗ vuông dịu
-    if(front){                                                          // vệt sáng nhẹ
-      ctx.fillStyle='rgba(255,255,255,.35)';
-      ctx.beginPath();ctx.ellipse(-r*.38,-r*.4,r*.2,r*.08,-.75,0,6.283);ctx.fill();
+    const c=Math.cos(ang), s=Math.sin(ang);
+    const w=Math.abs(c);                       // độ rộng nhìn thấy của mặt đồng
+    const rx=Math.max(.5,r*w);                 // bán kính ngang
+    const th=r*.2;                             // độ dày đồng xu
+    const fx=s*th/2;                           // mặt trước lệch sang một bên theo góc quay
+    const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+    const L=Math.abs(s);                       // cạnh sáng nhất khi đồng đứng nghiêng
+
+    /* 1) CẠNH ĐỒNG XU */
+    const edge=`rgb(${lerp(150,230,L)},${lerp(112,196,L)},${lerp(42,108,L)})`;
+    ctx.fillStyle=edge;
+    ctx.fillRect(Math.min(-fx,fx),-r,Math.abs(fx*2),r*2);
+    ctx.beginPath();ctx.ellipse(-fx,0,rx,r,0,0,6.283);ctx.fill();   // mặt sau
+    ctx.beginPath();ctx.ellipse( fx,0,rx,r,0,0,6.283);ctx.fill();   // mặt trước
+
+    /* 2) MẶT ĐỒNG GẦN NGƯỜI XEM NHẤT */
+    const front=c>=0, cx=front?fx:-fx;
+    ctx.save();
+    ctx.translate(cx,0);
+    ctx.beginPath();ctx.ellipse(0,0,rx,r,0,0,6.283);ctx.clip();
+
+    // nền vàng dịu + vệt sáng trượt ngang khi quay
+    const hl=Math.max(.15,Math.min(.85,.5+s*.38*(front?1:-1)));
+    const g=ctx.createLinearGradient(-rx,0,rx,0);
+    g.addColorStop(0,front?'#D9B65C':'#CFAA4F');
+    g.addColorStop(hl,front?'#F8EDC0':'#F0E0A6');
+    g.addColorStop(1,front?'#CFA845':'#C69C3E');
+    ctx.fillStyle=g;ctx.fillRect(-rx,-r,rx*2,r*2);
+
+    // chi tiết mặt đồng (co theo bề ngang)
+    ctx.save();ctx.scale(w,1);
+    ctx.lineWidth=Math.max(.7,r*.07);ctx.strokeStyle='rgba(160,115,32,.6)';
+    ctx.beginPath();ctx.arc(0,0,r*.8,0,6.283);ctx.stroke();          // viền nổi
+    if(front){
+      const h=r*.22;ctx.fillStyle='rgba(135,95,26,.5)';
+      ctx.fillRect(-h,-h,h*2,h*2);                                    // lỗ vuông mờ
     }
-  }
+    ctx.restore();
 
-  function spark(r,al){
-    ctx.fillStyle=`rgba(255,250,225,${al*.85})`;ctx.beginPath();
-    ctx.moveTo(0,-r);ctx.quadraticCurveTo(0,0,r,0);ctx.quadraticCurveTo(0,0,0,r);
-    ctx.quadraticCurveTo(0,0,-r,0);ctx.quadraticCurveTo(0,0,0,-r);ctx.fill();
+    // tối dần khi mặt đồng xoay nghiêng (bóng đổ)
+    ctx.fillStyle=`rgba(70,45,5,${(1-w)*.5})`;
+    ctx.fillRect(-rx,-r,rx*2,r*2);
+    ctx.restore();
   }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(const p of ps){
-      ctx.save();ctx.translate(p.x,p.y);ctx.globalAlpha=p.al;
-      if(kind==='snow'){
-        ctx.rotate(p.a);flake(p.r);                  // xoay theo kim đồng hồ hoặc ngược lại
-      }else if(kind==='mai'){
-        ctx.save();coin(p.r,p.a);ctx.restore();
-        const al=Math.pow(Math.max(0,Math.sin(p.tw)),8);               // lấp lánh thưa và nhẹ
-        if(al>.05){ctx.translate(p.r*.5,-p.r*.5);spark(p.r*.5*al+1,al);}
-      }else{
-        ctx.rotate(p.a);ctx.fillStyle='#F8A5C0';
-        ctx.beginPath();ctx.ellipse(0,0,p.r*1.5,p.r*.9,0,0,6.283);ctx.fill();
-      }
-      ctx.restore();
-    }
-  }
-
-  function loop(){
-    for(const p of ps){
-      p.s+=.015;p.tw+=.04;
-      p.x+=Math.sin(p.s)*p.sw;                       // lắc ngang nhẹ nhàng
-      p.y+=p.vy;
-      p.a+=p.dir*p.spin;                             // dir = +1 / -1 → hai chiều xoay
-      if(p.y>H+30){Object.assign(p,mk(false));}
-    }
-    draw();raf=requestAnimationFrame(loop);
-  }
-
-  function set(k){
-    kind=k;const n=innerWidth<700?22:42;
-    ps=Array.from({length:n},()=>mk(true));
-    if(!raf)loop();
-  }
-  return {set};
-})();
 
 /* ================== KHỞI TẠO ================== */
 $$('img[data-src]').forEach(i=>i.src=IMG[i.dataset.src]);
