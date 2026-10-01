@@ -200,24 +200,88 @@ $('#zaloBtn').href='https://zalo.me/'+CONFIG.zalo; $('#zaloShow').textContent=CO
 
 /* ================== HIỆU ỨNG RƠI (cánh hoa / tuyết / hoa mai) ================== */
 const fx=(()=>{
-  const cv=$('#fx'),ctx=cv.getContext('2d'); let W,H,ps=[],kind='petal',raf=null;
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const size=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;};addEventListener('resize',size);size();
-  const mk=(init)=>({x:Math.random()*W,y:init?Math.random()*H:-20,r:Math.random()*5+3,vy:Math.random()*.9+.5,vx:Math.random()*.6-.3,a:Math.random()*6.28,va:Math.random()*.03-.015,s:Math.random()*6.28});
-  function set(k){kind=k;const n=innerWidth<700?22:44;ps=Array.from({length:n},()=>mk(true));if(reduce){draw();return;} if(!raf)loop();}
+  const cv=$('#fx'),ctx=cv.getContext('2d');
+  let W,H,ps=[],kind='petal',raf=null;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const size=()=>{W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);};
+  addEventListener('resize',size);size();
+
+  const mk=init=>({
+    x:Math.random()*W, y:init?Math.random()*H:-30,
+    r:Math.random()*5+4, vy:Math.random()*.9+.5, vx:Math.random()*.6-.3,
+    a:Math.random()*6.28, va:Math.random()*.03-.015,
+    s:Math.random()*6.28, t:Math.random()*6.28
+  });
+
+  /* Bông tuyết 6 cánh, mỗi cánh có 2 cặp nhánh nhỏ */
+  function flake(r){
+    ctx.strokeStyle='rgba(255,255,255,.95)';
+    ctx.shadowColor='rgba(170,210,255,.9)';ctx.shadowBlur=4;
+    ctx.lineCap='round';ctx.lineWidth=Math.max(1,r*.12);
+    for(let i=0;i<6;i++){
+      ctx.save();ctx.rotate(i*Math.PI/3);
+      ctx.beginPath();
+      ctx.moveTo(0,0);ctx.lineTo(0,-r);                         // cánh chính
+      ctx.moveTo(0,-r*.45);ctx.lineTo(r*.3,-r*.7);              // nhánh trong
+      ctx.moveTo(0,-r*.45);ctx.lineTo(-r*.3,-r*.7);
+      ctx.moveTo(0,-r*.72);ctx.lineTo(r*.2,-r*.9);              // nhánh ngoài
+      ctx.moveTo(0,-r*.72);ctx.lineTo(-r*.2,-r*.9);
+      ctx.stroke();ctx.restore();
+    }
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,r*.12,0,6.283);ctx.fill();
+  }
+
+  /* Đồng tiền vàng tròn, có lỗ vuông và vệt sáng */
+  function coin(r){
+    const g=ctx.createRadialGradient(-r*.3,-r*.3,r*.1,0,0,r);
+    g.addColorStop(0,'#FFF7B8');g.addColorStop(.5,'#FFC83D');g.addColorStop(1,'#D98A00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,r,0,6.283);ctx.fill();
+    ctx.lineWidth=Math.max(1,r*.1);ctx.strokeStyle='#B8740A';
+    ctx.beginPath();ctx.arc(0,0,r*.84,0,6.283);ctx.stroke();      // viền nổi
+    const h=r*.3;ctx.fillStyle='#8A4B00';ctx.fillRect(-h,-h,h*2,h*2); // lỗ vuông
+    ctx.fillStyle='rgba(255,255,255,.6)';                          // vệt sáng
+    ctx.beginPath();ctx.ellipse(-r*.4,-r*.42,r*.22,r*.09,-.75,0,6.283);ctx.fill();
+  }
+
+  /* Tia lấp lánh 4 cánh */
+  function spark(r,al){
+    ctx.fillStyle=`rgba(255,255,255,${al})`;ctx.beginPath();
+    ctx.moveTo(0,-r);ctx.quadraticCurveTo(0,0,r,0);ctx.quadraticCurveTo(0,0,0,r);
+    ctx.quadraticCurveTo(0,0,-r,0);ctx.quadraticCurveTo(0,0,0,-r);ctx.fill();
+  }
+
   function draw(){
     ctx.clearRect(0,0,W,H);
     for(const p of ps){
-      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);
-      if(kind==='snow'){ctx.fillStyle='rgba(255,255,255,.92)';ctx.shadowColor='rgba(255,255,255,.8)';ctx.shadowBlur=6;ctx.beginPath();ctx.arc(0,0,p.r*.7,0,6.28);ctx.fill();}
-      else{ctx.fillStyle=kind==='petal'?'#F8A5C0':'#FFC93C';ctx.beginPath();ctx.ellipse(0,0,p.r*1.5,p.r*.9,0,0,6.28);ctx.fill();
-        if(kind==='mai'){ctx.fillStyle='#E8590C';ctx.beginPath();ctx.arc(0,0,p.r*.3,0,6.28);ctx.fill();}}
+      ctx.save();ctx.translate(p.x,p.y);
+      if(kind==='snow'){
+        ctx.rotate(p.a);flake(p.r*2);
+      }else if(kind==='mai'){                       // giao diện Tết = đồng tiền
+        const R=p.r*1.9;
+        ctx.save();ctx.scale(.75+.25*Math.abs(Math.cos(p.a)),1);coin(R);ctx.restore();
+        const al=Math.max(0,Math.sin(p.t))**3;
+        if(al>.05){ctx.translate(R*.45,-R*.45);spark(R*.9*al+2,al);}
+      }else{                                         // 20/10 = cánh hoa
+        ctx.rotate(p.a);ctx.fillStyle='#F8A5C0';
+        ctx.beginPath();ctx.ellipse(0,0,p.r*1.5,p.r*.9,0,0,6.283);ctx.fill();
+      }
       ctx.restore();
     }
   }
+
   function loop(){
-    for(const p of ps){p.s+=.02;p.x+=p.vx+Math.sin(p.s)*.5;p.y+=p.vy;p.a+=p.va;if(p.y>H+20||p.x<-30||p.x>W+30)Object.assign(p,mk(false));}
+    for(const p of ps){
+      p.s+=.02;p.t+=.06;p.x+=p.vx+Math.sin(p.s)*.5;p.y+=p.vy;p.a+=p.va;
+      if(p.y>H+30||p.x<-40||p.x>W+40)Object.assign(p,mk(false));
+    }
     draw();raf=requestAnimationFrame(loop);
+  }
+
+  function set(k){
+    kind=k;const n=innerWidth<700?22:40;
+    ps=Array.from({length:n},()=>mk(true));
+    if(!raf)loop();                                  // luôn cho rơi, không còn kiểm tra reduce-motion
   }
   return {set};
 })();
