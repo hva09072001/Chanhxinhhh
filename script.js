@@ -1,6 +1,6 @@
 /* ================== CẤU HÌNH – SỬA Ở ĐÂY ================== */
 const CONFIG = {
-  zalo: '0900000000',              // số Zalo nhận đơn
+  zalo: '0354125293',              // số Zalo nhận đơn
   freeShip: 500000,                // mức freeship
   discount: 0.10,                  // giảm khi nhập mã theo mùa
   /* Lịch tự đổi giao diện: đến ngày "until" (không tính) thì dùng theme tương ứng */
