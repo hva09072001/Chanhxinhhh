@@ -15,14 +15,14 @@ const IMG = { polo:'images/polo.jpg', back:'images/back.jpg', pink:'images/pink.
 
 /* ================== DỮ LIỆU SẢN PHẨM – SỬA GIÁ Ở ĐÂY ================== */
 const PRODUCTS = [
-  { id:'p1', name:'Váy polo tutu trắng cổ bèo nơ', price:569000, old:1200000, imgs:['polo','back'], tags:['Quà tặng','Đi chơi'], badge:'Hot', sizes:['S','M','L'],
+  { id:'p1', name:'Váy polo tutu trắng cổ bèo nơ', price:749000, old:1200000, imgs:['polo','back'], tags:['Quà tặng','Đi chơi'], badge:'Hot', sizes:['S','M','L'],
     desc:['Cổ bèo thắt nơ đen, tay ngắn bồng nhẹ','Lưng ren đính sequin lấp lánh','Chân váy tutu xoè bồng bềnh'] },
-  { id:'p2', name:'Váy hồng tay phồng chân váy ren', price:650000, old:899000, imgs:['pink'], tags:['Quà tặng','Đi chơi','Đi tiệc'], badge:'Best seller', sizes:['S','M','L'],
+  { id:'p2', name:'Váy hồng tay phồng chân váy ren', price:350000, old:545000, imgs:['pink'], tags:['Quà tặng','Đi chơi','Đi tiệc'], badge:'Best seller', sizes:['S','M','L'],
     desc:['Cổ vuông, tay phồng nữ tính','Thân váy xoè tầng, chiết eo tôn dáng','Viền ren trắng nhiều lớp'] },
-  { id:'p3', name:'Váy trắng xoè nhiều tầng phối ren', price:569000, old:0, imgs:['layer'], tags:['Đi tiệc','Quà tặng'], badge:'Mới về', sizes:['S','M','L'],
+  { id:'p3', name:'Váy trắng xoè nhiều tầng phối ren', price:379000, old:579000, imgs:['layer'], tags:['Đi tiệc','Quà tặng'], badge:'Mới về', sizes:['S','M','L'],
     desc:['Dáng cúp ôm, chân váy organza nhiều tầng','Phối ren tinh tế, đứng form','Hợp đi tiệc, chụp ảnh, dạo phố'] },
-  { id:'p4', name:'Váy trắng xoè tầng bản basic', price:399000, old:0, imgs:['layer'], tags:['Đi chơi'], badge:'Giá tốt', sizes:['S','M','L'],
-    desc:['Bản giá mềm, mặc hằng ngày','Dáng xoè nhẹ, dễ phối giày','(Ảnh mẫu tạm, thay bằng ảnh thật)'] }
+ // { id:'p4', name:'Váy trắng xoè tầng bản basic', price:399000, old:0, imgs:['layer'], tags:['Đi chơi'], badge:'Giá tốt', sizes:['S','M','L'],
+ //   desc:['Bản giá mềm, mặc hằng ngày','Dáng xoè nhẹ, dễ phối giày','(Ảnh mẫu tạm, thay bằng ảnh thật)'] }
 ];
 
 /* ================== NỘI DUNG THEO MÙA ================== */
