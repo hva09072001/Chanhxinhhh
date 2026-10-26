@@ -32,19 +32,19 @@ const THEMES = {
     h1:'Chị em xinh, Chanh Xinhhh chiều!', sub:'Váy tutu, váy xoè ren bồng bềnh. Mua tặng mẹ, người yêu, bạn thân hay tự thưởng cho mình đều được khen.',
     cta:'Chọn váy tặng 20/10', sec:'Quà tặng 20/10 xinh nhất', secSub:'Váy đóng túi quà hồng, sẵn sàng trao tay.',
     band:'Tặng chị em, giảm ngay 10%', bandSub:'Nhập mã ở giỏ hàng. Mỗi váy kèm túi quà hồng dịp 20/10.',
-    popH:'Quà 20/10 cho chị em', popP:'Nhận mã giảm 10% cho đơn đầu tiên và túi quà hồng kèm váy \nIB Zalo: 0354125293 để nhận ưu đãi' },
+    popH:'Quà 20/10 cho chị em', popP:'Nhận mã giảm 10% cho đơn đầu tiên và túi quà hồng kèm váy' , popH:'Zalo: 0354125293 để nhận ưu đãi' },
   n:{ code:'NOEL2026', target:'2026-12-25T00:00:00+07:00', label:'Còn lại đến đêm Noel', fx:'snow',
     bar:'Noel rộn ràng · Freeship đơn từ 500K · Mã <b>NOEL2026</b> giảm 10% - IB Zalo: 0354125293 để nhận ưu đãi',
     h1:'Noel này, Chanh Xinhhh cùng bạn tỏa sáng', sub:'Váy trắng tinh khôi như tuyết, váy hồng ngọt như kẹo. Diện đi chơi Noel là nổi bật giữa phố.',
     cta:'Chọn váy đi chơi Noel', sec:'Outfit đi chơi Noel', secSub:'Xinh từ quảng trường đến bữa tiệc tối.',
     band:'Quà Noel cho bạn và người thương', bandSub:'Nhập mã ở giỏ hàng để giảm 10%. Đặt sớm để kịp ship trước đêm 24.',
-    popH:'Ông già Noel gửi quà', popP:'Nhận mã giảm 10% cho đơn đầu tiên, đặt trước 20/12 để kịp giao \nIB Zalo: 0354125293 để nhận ưu đãi' },
+    popH:'Ông già Noel gửi quà', popP:'Nhận mã giảm 10% cho đơn đầu tiên, đặt trước 20/12 để kịp giao' , popH:'Zalo: 0354125293 để nhận ưu đãi' },
   t:{ code:'TET2027', target:'2027-02-06T00:00:00+07:00', label:'Còn lại đến mùng 1 Tết', fx:'mai',
     bar:'Tết này diện đẹp · Freeship đơn từ 500K · Mã <b>TET2027</b> giảm 10% - IB Zalo: 0354125293 để nhận ưu đãi',
     h1:'Tết này diện đẹp cùng Chanh Xinhhh', sub:'Váy xinh chụp ảnh Tết, đi chúc Tết, dạo phố xuân. Chọn sớm để kịp ship trước Giao thừa.',
     cta:'Chọn váy diện Tết', sec:'Outfit mặc Tết', secSub:'Váy sáng màu, lên hình đẹp như hoa mai.',
     band:'Lì xì đầu năm, giảm ngay 10%', bandSub:'Nhập mã ở giỏ hàng. Đặt trước 25 tháng Chạp để kịp giao.',
-    popH:'Lì xì từ Chanh Xinhhh', popP:'Nhận mã giảm 10% cho đơn đầu tiên, chúc bạn một năm mới xinh đẹp \nIB Zalo: 0354125293 để nhận ưu đãi' }
+    popH:'Lì xì từ Chanh Xinhhh', popP:'Nhận mã giảm 10% cho đơn đầu tiên, chúc bạn một năm mới xinh đẹp' , popH:'Zalo: 0354125293 để nhận ưu đãi' }
 };
 
 /* ================== TIỆN ÍCH ================== */
