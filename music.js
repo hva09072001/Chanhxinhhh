@@ -25,7 +25,7 @@
     t: 'music/tet.mp3'         // giao diện Tết
   };
   var FALLBACK_TRACK = 'music/nhac-nen.mp3';   // dùng khi giao diện không có bài riêng hoặc file bị thiếu
-  var VOLUME = 0.35;                           // 0 đến 1; để nhỏ cho dễ chịu
+  var VOLUME = 0.75;                           // 0 đến 1; để nhỏ cho dễ chịu
   var SHOW_HINT = true;                        // hiện bong bóng "Bật nhạc nhé" (chỉ khi KHÔNG dùng màn chào)
 
   var WELCOME_SCREEN = true;                   // true = hiện màn chào, khách chạm "Vào shop" là có nhạc ngay. false = tắt màn chào
